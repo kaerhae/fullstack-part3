@@ -1,6 +1,8 @@
+const Person = require('./models/persons')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+
 const app = express()
 
 app.use(cors())
@@ -42,6 +44,9 @@ const genId = () => {
     const randNum = Math.floor(Math.random() * Math.floor(1000))
     return randNum
 }
+
+
+
 
 
 app.get('/', (req, res) => {
