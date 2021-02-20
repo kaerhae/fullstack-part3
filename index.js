@@ -3,6 +3,7 @@ const Phonebook = require('./models/persons')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const { request, response } = require('express')
 
 const app = express()
 
@@ -20,16 +21,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 
 
-const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
 
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  }
-
-  next(error)
-}
-app.use(errorHandler)
 
 
 app.get('/api/persons', (request, response) => {
@@ -52,15 +44,17 @@ app.get('/api/persons/:id', (request, response, next) => {
 .catch(error => next(error))
 })
 
+
+
 app.get('/info', (request, response) => {
-    const count = persons.length
+    const count = Phonebook.length
     let ts = Date().toLocaleString()
     const rend = `<p>Phonebook has info for ${count} people</p> <p>${ts}</p>`
     response.send(rend)
 
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
   
     if (body.name === undefined) {
@@ -80,6 +74,8 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedPerson => {
       response.json(savedPerson)
     })
+    .catch(error => next(error))
+
   })
 
   app.delete('/api/persons/:id', (request, response, next) => {
@@ -89,6 +85,36 @@ app.post('/api/persons', (request, response) => {
       })
       .catch(error => next(error))
   })
+
+  app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = new Phonebook({
+      name: body.name,
+      number: body.number,
+    })
+
+    Phonebook.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPhonebook => {
+      response.json(updatedPhonebook)
+    })
+    .catch(error => next(error))
+  })
+
+  const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    if (error.name === 'ValidationError') {
+      return response.status(400).send({error: 'You are passing a duplicate name'})
+    }
+  
+    next(error)
+  }
+  app.use(errorHandler)
   
 
 const PORT = process.env.PORT
