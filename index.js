@@ -46,10 +46,16 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 
 app.get('/info', (request, response) => {
-    const count = Phonebook.length
+
+  const count = Phonebook.countDocuments({}).then(phonebook => {
+    console.log(phonebook)
+
     let ts = Date().toLocaleString()
-    const rend = `<p>Phonebook has info for ${count} people</p> <p>${ts}</p>`
+    const rend = `<p>Phonebook has info for ${phonebook} people</p> <p>${ts}</p>`
     response.send(rend)
+  })
+  
+ 
 
 })
 
