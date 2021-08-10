@@ -7,8 +7,8 @@ const url = `mongodb+srv://fullstack:${password}@fullstackcluster.jjjny.mongodb.
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+  name: String,
+  number: String,
 
 })
 
@@ -20,26 +20,25 @@ const nameInput = process.argv[3]
 const numberInput = process.argv[4]
 
 if (process.argv.length<4) {
-    console.log("päästiinkötänne?")
-    Phonebook.find({})
+  Phonebook.find({})
     .then(result => {
-        result.forEach(person => {
-            console.log(person)
-            mongoose.connection.close()
+      result.forEach(person => {
+        console.log(person)
+        mongoose.connection.close()
 
-        })
-        process.exit(1)
+      })
+      process.exit(1)
 
     })
 }
 
 const phonebook = new Phonebook({
-    name: nameInput,
-    number: numberInput,
+  name: nameInput,
+  number: numberInput,
 })
 
 phonebook.save()
-.then(response => {
-    console.log(`Added ${nameInput} number ${numberInput} to phonebook`)
+  .then(response => {
+    console.log(`Added ${nameInput} number ${numberInput} to phonebook`, response)
     mongoose.connection.close()
-})
+  })
